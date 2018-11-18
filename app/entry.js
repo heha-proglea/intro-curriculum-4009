@@ -18,10 +18,14 @@ movingButton.click(() => {
 const loadavg = $('#loadavg');
 
 import io from 'socket.io-client';
+// Socketオブジェクトの生成
 const socket = io('http://localhost:8000');
 socket.on('server-status', (data) => {
   loadavg.text(data.loadavg.toString());
 });
+
+
+// ----- WebSocket接続/切断時にconsole.log()を出力する -----
 
 // connectイベントハンドラ(WebSocket通信の接続時の処理)の定義
 socket.on('connect', () => {

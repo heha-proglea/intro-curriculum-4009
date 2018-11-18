@@ -89,14 +89,24 @@ function onListening() {
   debug('Listening on ' + bind);
 }
 
+// ----- モジュールSocket.IOを用いてWebSocket通信を行う -----
+// サーバー用Socket.IOモジュールのを読み込みつつ、引数にHTTPサーバーを受け取る
 var io = require('socket.io')(server);
+// クライアント用Socket.IOモジュールのを読み込み
 var os = require('os');
 
-function emitServerStatus(socket) {
+// WebSocket接続に対してイベントserver-statusを発行する関数
+function emitServerStatus(socket) { // 引数socketとして受け取るのはSocketオブジェクト
+  // WebSocketの接続時に、イベント名:server-status、受け渡すデータ:{ ﾌﾟﾛﾊﾟﾃｨ名: ﾛｰﾄﾞｱﾍﾞﾚｰｼﾞﾃﾞｰﾀ }(<-JSON形式)で、イベントを発行する
+  // socket.emit関数: 文字列で定義したイベントを、データと共に発行できる関数
   socket.emit('server-status', { loadavg: os.loadavg() });
+  // イベント発行後にログを出力
   console.log('server-status event emitted.');
 }
 
-io.on('connection', function (socket) {
+// WebSocket接続の確立時にemitServerStatus関数を定期的に呼び出す
+io.on('connection', function (socket) { // 引数socketとして受け取るのはSocketオブジェクト
+  // WebSocket接続が確立した時に発行されるイベントconnectionの受け取り時に実行されるコールバック関数
+  // 10ms毎に、emitServerStatus関数へ引数socket(=Socketオブジェクト)を渡しつつ呼び出す
   setInterval(emitServerStatus, 10, socket);
 });
